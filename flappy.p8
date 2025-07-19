@@ -6,11 +6,12 @@ __lua__
 	screen_h = 128
 	x=10
 	y=64
-	fall_set={1,2,3,4,5}--,6}
+	fall_set={1,2,3,4,5,6}
 	curr = 1
 	f =1 -- frame animation
-	flight_slowness = 2
+	flight_slowness = 1 
 
+	FRAME_JUMP = 2
 	g = 2 -- gravity (each frame)
 	state="idle" -- idle, up
 	animation_up_timer=5;
@@ -31,8 +32,7 @@ function _update()
 end 
 
 function rise() 
-	y -= 1
-	f +=1
+	y -= FRAME_JUMP
 	if f == flight_slowness then 
 		if curr == count(fall_set) then -- reset animation 
 			print(f)
@@ -43,6 +43,7 @@ function rise()
 		end -- animation update 
 		f=0
 	end -- flight slowness
+	f +=1
 end
 
 function _draw()
