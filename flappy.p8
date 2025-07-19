@@ -4,54 +4,73 @@ __lua__
 	BLOCK_UNIT = 8
 	screen_w = 128
 	screen_h = 128
-	x=10
-	y=64
-	fall_set={1,2,3,4,5,6,7}
-	curr = 1
+	
 	f =1 -- frame animation
 	flight_slowness = 1 
 
 	FRAME_JUMP = 4
 	g = 2 -- gravity (each frame)
-	state="idle" -- idle, up
 	animation_up_timer=5;
 	t=0
 
+	fall_set={1,2,3,4,5,6,7}
 	PIPESET = {}
 
 	rndpiperange = 3
 	pipespace = 3
 	pipeminheight = 6
 
+	player_w = 8
+	player_h = 8
+
+function _init()
+	resetGame()
+end
+
+function resetGame() 
+	x=10
+	y=64
+	state="idle" -- idle, up
+	PIPESET = {}
+	
+	current_animation = 1
+end
+
 function _update() 
-	if state == "idle" then
-		if btnp(4) then
-			state= "up"
+	if state != "dead" then
+			
+		if state == "idle" then
+			if btnp(4) then
+				state= "up"
+				rise()
+			else 
+				fall()
+			end -- button animation pressed
+		elseif state == "up" then
 			rise()
+		end
+		
+		if count(PIPESET) == 0 then
+			create_rnd_pipe()
 		else 
-			fall()
-		end -- button animation pressed
-	elseif state == "up" then
-		rise()
-	end
+			approach_pipe()
+		end
 	
-	if count(PIPESET) == 0 then
-		create_rnd_pipe()
+		detect_collision()
 	else 
-		approach_pipe()
+		if(btnp(5)) then resetGame() end
 	end
-	
 end 
 
 function rise() 
 	if y > 0 then y -= FRAME_JUMP end
 	if f == flight_slowness then 
-		if curr == count(fall_set) then -- reset animation 
+		if current_animation == count(fall_set) then -- reset animation 
 			print(f)
-			curr = 1
+			current_animation = 1
 			state = "idle"
 		else 
-			curr +=1
+			current_animation +=1
 		end -- animation update 
 		f=0
 	end -- flight slowness
@@ -59,11 +78,14 @@ function rise()
 end
 
 function _draw()
- 	cls()
-	map(1,1,1,1,128,128)
-	drawPipe()
- 	
-	spr(curr,x,y)
+	if state != "dead" then
+		cls()
+		map(1,1,1,1,128,128)
+		drawPipe()
+		spr(current_animation,x,y)
+	else
+		drawDead()
+	end
 end
 -->8
 
@@ -127,6 +149,49 @@ function drawPipe()
 		spr(e.t, e.x*BLOCK_UNIT, e.y* BLOCK_UNIT)
 	end)
 end
+
+function detect_collision()
+	foreach(PIPESET, function(p)
+		local px = p.x * BLOCK_UNIT
+		local py = p.y * BLOCK_UNIT
+		local pw = 8
+		local ph = 8
+
+		if check_collision(x, y, player_w, player_h, px, py, pw, ph) then
+			state = "dead"
+		end
+	end)
+
+	-- fuori dallo schermo
+	if y < 0 or y > screen_h - player_h then
+		state = "dead"
+	end
+end
+
+
+function check_collision(a_x, a_y, a_w, a_h, b_x, b_y, b_w, b_h)
+	return not (
+		a_x + a_w < b_x or
+		a_x > b_x + b_w or
+		a_y + a_h < b_y or
+		a_y > b_y + b_h
+	)
+end
+
+function drawDead()
+	cls()
+	map(1,1,1,1,128,128)
+	drawPipe()
+	spr(current_animation,x,y)
+
+	if state == "dead" then
+		rectfill(20, 40, 108, 88, 0)         -- sfondo nero per il box
+		rect(20, 40, 108, 88, 7)             -- bordo bianco
+		print("GAME OVER", 40, 50, 8)
+		print("premi 🅾️ per riprovare", 25, 70, 7)
+	end
+end
+
 __gfx__
 00000000000000000000000000000000000000000000000006600000006000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000660000000600000006000000000000000000000000000000000000000000000000000000000000000000000
