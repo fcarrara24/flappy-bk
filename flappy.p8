@@ -112,19 +112,15 @@ function create_rnd_pipe()
 	for p=0, pipestart -1 do
 		if p < pipestart -2 then
 			insert_element(screen_right, p, 34) 
-			-- mset(screen_right, p, 34)
 		else
 			insert_element(screen_right, p, 33) 
-			-- mset(screen_right,p,33)
 		end
 	end
 	-- last pipe
 	for p=pipestart +pipespace, (screen_h / BLOCK_UNIT) +pipespace do
 		if p >pipestart +pipespace then
 			insert_element(screen_right, p, 34) 
-			-- mset(screen_right, p, 34) -- mset(screen_right, p, 34)
 		else
-			-- mset(screen_right, p, 32)
 			insert_element(screen_right, p, 32) 
 		end
 	end
@@ -177,30 +173,6 @@ function detect_collision()
 	-- fuori dallo schermo
 	if y < 0 or y > screen_h - player_h then
 		state = "dead"
-	end
-end
-
-
-function check_collision(a_x, a_y, a_w, a_h, b_x, b_y, b_w, b_h)
-	return not (
-		a_x + a_w < b_x or
-		a_x > b_x + b_w or
-		a_y + a_h < b_y or
-		a_y > b_y + b_h
-	)
-end
-
-function drawDead()
-	cls()
-	map(1,1,1,1,128,128)
-	drawPipe()
-	spr(current_animation,x,y)
-
-	if state == "dead" then
-		rectfill(20, 40, 108, 88, 0)         -- sfondo nero per il box
-		rect(20, 40, 108, 88, 7)             -- bordo bianco
-		print("GAME OVER", 40, 50, 8)        -- colore rosso
-		print("premi 🅾️ per riprovare", 25, 70, 7)
 	end
 end
 
