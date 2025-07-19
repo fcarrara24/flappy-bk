@@ -9,15 +9,16 @@ __lua__
 	flight_slowness = 1 
 
 	FRAME_JUMP = 4
-	g = 2 -- gravity (each frame)
+	g = 1.5 -- gravity (each frame)
 	animation_up_timer=5;
 	t=0
 
 	fall_set={1,2,3,4,5,6,7}
-	PIPESET = {}
+	PIPESET={}
+	APPROACH_SPEED = 2
 
 	rndpiperange = 3
-	pipespace = 3
+	pipespace = 4
 	pipeminheight = 6
 
 	player_w = 8
@@ -32,7 +33,6 @@ function resetGame()
 	y=64
 	state="idle" -- idle, up
 	PIPESET = {}
-	
 	current_animation = 1
 end
 
@@ -132,7 +132,7 @@ end
 function approach_pipe()
 	local to_remove = {}
 	foreach(PIPESET, function (e)
-		e.x -= 1/BLOCK_UNIT
+		e.x -= APPROACH_SPEED/BLOCK_UNIT
 		if e.x < 0 then
 			add(to_remove, e)
 		end
@@ -187,7 +187,7 @@ function drawDead()
 	if state == "dead" then
 		rectfill(20, 40, 108, 88, 0)         -- sfondo nero per il box
 		rect(20, 40, 108, 88, 7)             -- bordo bianco
-		print("GAME OVER", 40, 50, 8)
+		print("GAME OVER", 40, 50, 8)        -- colore rosso
 		print("premi 🅾️ per riprovare", 25, 70, 7)
 	end
 end
