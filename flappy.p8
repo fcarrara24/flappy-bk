@@ -1,95 +1,64 @@
 pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
---[[
--
-function _init()
+
 	screen_w = 128
 	screen_h = 128
 	x=10
 	y=64
-	fall_set={1,2,3,4,5,6}
+	fall_set={1,2,3,4,5}--,6}
 	curr = 1
 	f =1 -- frame animation
-	flight_slowness = 4
+	flight_slowness = 2
 
-	g = 1 -- gravity (each frame)
-end
+	g = 2 -- gravity (each frame)
+	state="idle" -- idle, up
+	animation_up_timer=5;
+	t=0
 
 function _update() 
+	if state == "idle" then
+		if btnp(4) then
+			state= "up"
+			rise()
+		else 
+			fall()
+		end -- button animation pressed
+	elseif state == "up" then
+		rise()
+	end
 	
-	animation_up()
 end 
 
+function rise() 
+	y -= 1
+	f +=1
+	if f == flight_slowness then 
+		if curr == count(fall_set) then -- reset animation 
+			print(f)
+			curr = 1
+			state = "idle"
+		else 
+			curr +=1
+		end -- animation update 
+		f=0
+	end -- flight slowness
+end
+
 function _draw()
- cls()
- map(1,1,1,1,128,128)
- x=10
-	y=64
+ 	cls()
+ 	map(1,1,1,1,128,128)
 	spr(curr,x,y)
 end
 -->8
 
-function animation_up() 
-	if f == flight_slowness then
-		if curr<count(fall_set) then
-			curr +=1
-		else
-			curr = 1
-		end -- update if
-		f = 1
-	else 
-		f +=1
-	end -- update cycle
-end 
 
 function fall()
-	if x > 1 then
-		x-=g
+	if y < 120 then
+		y+=g
 	end
 end
---]]
--- posizione iniziale
-x = 64
-y_base = 64
-y = y_base
 
--- animazione
-animazione = {1, 2, 3, 4} -- id sprite
-anim_frame = 1
-anim_timer = 0
-anim_speed = 2-- frame per sprite
-
--- stato
-stato = "idle"
-
-function _update()
-    if stato == "idle" then
-        if btnp(4) then -- tasto Z
-            y -= 32 -- salta di 4 caselle
-            anim_frame = 1
-            anim_timer = 0
-            stato = "saltando"
-        end
-    elseif stato == "saltando" then
-        anim_timer += 1
-        if anim_timer >= anim_speed then
-            anim_timer = 0
-            anim_frame += 1
-            if anim_frame > #animazione then
-                stato = "idle"
-                y = y_base
-                anim_frame = 1
-            end
-        end
-    end
-end
-
-function _draw()
-    cls()
-    local sprite_id = animazione[anim_frame]
-    spr(sprite_id, x, y)
-end
 
 __gfx__
 00000000000000000000000000000000000000000000000006600000000000000000000000000000000000000000000000000000000000000000000000000000
