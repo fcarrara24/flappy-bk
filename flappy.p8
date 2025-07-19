@@ -60,8 +60,9 @@ end
 
 function _draw()
  	cls()
+	map(1,1,1,1,128,128)
 	drawPipe()
- 	map(1,1,1,1,128,128)
+ 	
 	spr(curr,x,y)
 end
 -->8
@@ -78,18 +79,18 @@ function create_rnd_pipe()
 	local screen_right = screen_w / BLOCK_UNIT -1
 	-- first pipe
 	for p=0, pipestart -1 do
-		if p < pipestart -1 then
-			insert_element(screen_right, p, 32) 
+		if p < pipestart -2 then
+			insert_element(screen_right, p, 34) 
 			-- mset(screen_right, p, 34)
 		else
-			insert_element(screen_right, p, 32) 
+			insert_element(screen_right, p, 33) 
 			-- mset(screen_right,p,33)
 		end
 	end
 	-- last pipe
 	for p=pipestart +pipespace, (screen_h / BLOCK_UNIT) +pipespace do
 		if p >pipestart +pipespace then
-			insert_element(screen_right, p, 32) 
+			insert_element(screen_right, p, 34) 
 			-- mset(screen_right, p, 34) -- mset(screen_right, p, 34)
 		else
 			-- mset(screen_right, p, 32)
@@ -123,7 +124,7 @@ end
 
 function drawPipe()
 	foreach(PIPESET, function (e)
-		mset(flr(e.x), e.y, e.t)
+		spr(e.t, e.x*BLOCK_UNIT, e.y* BLOCK_UNIT)
 	end)
 end
 __gfx__
