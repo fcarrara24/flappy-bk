@@ -107,18 +107,23 @@ function insert_element(x, y, type)
 end
 
 function approach_pipe()
+	local to_remove = {}
 	foreach(PIPESET, function (e)
-		if(e==0) then
-			del(PIPESET, e)
-		else 
-			e.x -= 1/BLOCK_UNIT
+		e.x -= 1/BLOCK_UNIT
+		if e.x < 0 then
+			add(to_remove, e)
 		end
+	end)
+
+	-- rimuove dopo il ciclo per evitare conflitti
+	foreach(to_remove, function(e)
+		del(PIPESET, e)
 	end)
 end
 
 function drawPipe()
 	foreach(PIPESET, function (e)
-		mset(e.x, e.y, e.t)
+		mset(flr(e.x), e.y, e.t)
 	end)
 end
 __gfx__
