@@ -28,13 +28,6 @@ function _init()
 	resetGame()
 end
 
-function resetGame() 
-	x=10
-	y=64
-	state="idle" -- idle, up
-	PIPESET = {}
-	current_animation = 1
-end
 
 function _update() 
 	if state != "dead" then
@@ -62,6 +55,34 @@ function _update()
 	end
 end 
 
+
+function _draw()
+	if state != "dead" then
+		cls()
+		map(1,1,1,1,128,128)
+		drawPipe()
+		spr(current_animation,x,y)
+	else
+		drawDead()
+	end
+end
+-->8
+
+function resetGame() 
+	x=10
+	y=64
+	state="idle" -- idle, up
+	PIPESET = {}
+	current_animation = 1
+end
+
+function fall()
+	if y < 120 then
+		y+=g
+	end
+end
+
+
 function rise() 
 	if y > 0 then y -= FRAME_JUMP end
 	if f == flight_slowness then 
@@ -77,24 +98,12 @@ function rise()
 	f +=1
 end
 
-function _draw()
-	if state != "dead" then
-		cls()
-		map(1,1,1,1,128,128)
-		drawPipe()
-		spr(current_animation,x,y)
-	else
-		drawDead()
-	end
-end
+
+
+
+
 -->8
-
-
-function fall()
-	if y < 120 then
-		y+=g
-	end
-end
+-- insert and move pipe
 
 function create_rnd_pipe()
 	local pipestart = rnd(rndpiperange) +pipeminheight
@@ -150,6 +159,9 @@ function drawPipe()
 	end)
 end
 
+-->8
+-- search collision in code
+
 function detect_collision()
 	foreach(PIPESET, function(p)
 		local px = p.x * BLOCK_UNIT
@@ -168,6 +180,32 @@ function detect_collision()
 	end
 end
 
+
+function check_collision(a_x, a_y, a_w, a_h, b_x, b_y, b_w, b_h)
+	return not (
+		a_x + a_w < b_x or
+		a_x > b_x + b_w or
+		a_y + a_h < b_y or
+		a_y > b_y + b_h
+	)
+end
+
+function drawDead()
+	cls()
+	map(1,1,1,1,128,128)
+	drawPipe()
+	spr(current_animation,x,y)
+
+	if state == "dead" then
+		rectfill(20, 40, 108, 88, 0)         -- sfondo nero per il box
+		rect(20, 40, 108, 88, 7)             -- bordo bianco
+		print("GAME OVER", 40, 50, 8)        -- colore rosso
+		print("premi 🅾️ per riprovare", 25, 70, 7)
+	end
+end
+
+-->8
+-- draw death and new begin
 
 function check_collision(a_x, a_y, a_w, a_h, b_x, b_y, b_w, b_h)
 	return not (
