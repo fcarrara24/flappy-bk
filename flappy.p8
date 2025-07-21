@@ -24,9 +24,10 @@ __lua__
 	player_w = 8
 	player_h = 8
 
-	cloud_animation_slowness=8
-	cloudn_counter = 0
+	cloud_animation_slowness=32
+	cloud_a_counter = 0
 
+	-- cd fl/flappy-bk
 function _init()
 	resetGame()
 end
@@ -93,7 +94,6 @@ function rise()
 	if y > 0 then y -= FRAME_JUMP end
 	if f == flight_slowness then 
 		if current_animation == count(fall_set) then -- reset animation 
-			print(f)
 			current_animation = 1
 			state = "idle"
 		else 
@@ -255,13 +255,20 @@ function create_cloud()
 	local index = flr(rnd(#cloud_set)) + 1
 	local cloud_type = cloud_set[index]
 	local direction = flr(rnd(2)) -- 0 = sinistra, 1 = destra
-	local dir = direction == 0 and -1 or 1
+	if direction == 0 then
+		dir = -1 
+	else 
+		dir = 1
+	end
+		
 
 	local x_spawn_positions = { (0-cloud_type.w), screen_w }
 	local cloud_spawn_x = x_spawn_positions[direction]
+	
 
 	local cloud_spawn_y = rnd(screen_h)
 
+	return
 	add(active_cloud, {
 		i=cloud_type.i, 
 		w=cloud_type.w, 
@@ -277,22 +284,26 @@ end
 function draw_nuvole()
 	lb_move = is_move() -- si muove ogni x frame
 	foreach(active_cloud, function(c)
+			if not c.x then 
+				c.x = 0
+			end
+			c.x = c.x - (c.d * c.s)
 		
-		c.x -= c.dir *c.s
+
 		if(cloud_in_bound(c.x, c.w)) then
-			spr(c.i,c.x,c.y,c.w,c.h)
+			spr(c.i,c.x,c.y,min(c.w, (screen_w-(2*c.w)-c.x)),c.h)
 		else 
-			del(cloud_set, c)
+			del(active_cloud, c)
 		end
 	end)
 end
 
 function is_move() 
-	if(cloud_in_bound == #cloud_animation_slowness) then
-		cloud_in_bound = 0
+	if(cloud_a_counter == cloud_animation_slowness) then
+		cloud_a_counter = 0
 		return true
 	end
-		cloud_in_bound +=1
+		cloud_a_counter +=1
 		return false
 end 
 
