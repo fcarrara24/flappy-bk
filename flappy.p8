@@ -24,7 +24,7 @@ __lua__
 	player_w = 8
 	player_h = 8
 
-	cloud_animation_slowness=8
+	cloud_animation_slowness=1
 	cloud_a_counter = 0
 	debug =""
 
@@ -65,7 +65,7 @@ end
 function _draw()
 	if state != "dead" then
 		cls()
-		map(1,1,1,1,128,128)
+		map(1,1,0,0,128,128)
 		draw_nuvole(is_move()) -- si muove ogni x frame)
 		drawPipe()
 		spr(current_animation,x,y)
@@ -280,7 +280,7 @@ function draw_nuvole(lb_move)
 		end
 
 		if lb_move then
-			c.x = c.x - (c.d * c.s)
+			c.x = c.x - ((c.d * c.s)/8)
 		end 
 
 		if(cloud_in_bound(c.x, c.w)) then
