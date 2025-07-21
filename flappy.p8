@@ -28,6 +28,7 @@ __lua__
 	cloud_a_counter = 0
 
 	dead_timer =0
+	points =0
 
 	-- cd fl/flappy-bk
 function _init()
@@ -68,7 +69,7 @@ function _update()
 
 		dead_timer += 1
 
-		if dead_timer > 30 and btnp(5) then
+		if dead_timer > 0 and btnp(5) then
 			resetGame()
 		end
 	end
@@ -82,6 +83,7 @@ function _draw()
 		map(1,1,0,0,128,128)
 		draw_nuvole(is_move()) -- si muove ogni x frame)
 		drawPipe()
+		draw_points()
 		spr(current_animation,x,y)
 	else
 		drawDead()
@@ -97,6 +99,7 @@ function resetGame()
 	current_animation = 1
 	played_death_sfx = 0
 	dead_timer= 0
+	points = 0
 	init_cloudset()
 end
 
@@ -159,13 +162,17 @@ end
 
 function approach_pipe()
 	local to_remove = {}
+	local pipes_x = 999
 	foreach(PIPESET, function (e)
 		e.x -= APPROACH_SPEED/BLOCK_UNIT
 		if e.x < 0 then
 			add(to_remove, e)
 		end
+		pipes_x = e.x
 	end)
-
+	if (pipes_x*BLOCK_UNIT)== (x+player_w) then
+		points = points + 1
+	end
 	-- rimuove dopo il ciclo per evitare conflitti
 	foreach(to_remove, function(e)
 		del(PIPESET, e)
@@ -324,6 +331,29 @@ function cloud_in_bound(x, w)
 		return false
 	end
 		return true
+end
+
+-->8
+--gestione punti
+
+function draw_points()
+	local w = 40
+	local h = 20
+	local x = (screen_w -w)/2 
+	local y = 10
+	rectfill(x, y, x+w, y+h, 0)         -- sfondo nero per il box
+	rect(x, y, x+w, y+h, 7)             -- bordo bianco
+
+	print("p: "..pad2(points), x+w/2 -8, y+h/2 -2)
+end
+
+function pad2(n)
+	local s = tostr(n)
+	if (#s < 2) then
+		return "0"..s
+	else
+		return s
+	end
 end
 __gfx__
 0000000000600000066000000000000000000000000000000000000000000000cccccccc00000000000000000000000000000000000000000000000000000000
