@@ -24,7 +24,7 @@ __lua__
 	player_w = 8
 	player_h = 8
 
-	cloud_animation_slowness=32
+	cloud_animation_slowness=8
 	cloud_a_counter = 0
 
 	-- cd fl/flappy-bk
@@ -233,18 +233,10 @@ end
 
 function create_rnd_cloud()
 	local l = #active_cloud; 
-	local prob = 1
-	if (l==0) then
-		prob = 0.2
-	elseif l==1 then
-		prob = 0.08
-	elseif l==2 then
-		prob = 0.03
-	elseif l==3 then
-		prob = 0.01
-	else 
-		return -- no more then 4
-	end
+	local prob_range = {0.5, 0.2, 0.08, 0.05, 0.04, 0}
+	local prob = prob_range[l+1]
+	
+	if(prob == 0 )return 
 
 	if(rnd(1/prob)) then
 		create_cloud()
@@ -284,11 +276,14 @@ end
 function draw_nuvole()
 	lb_move = is_move() -- si muove ogni x frame
 	foreach(active_cloud, function(c)
-			if not c.x then 
-				c.x = 0
-			end
-			c.x = c.x - (c.d * c.s)
 		
+		if not c.x then 
+			c.x = 0
+		end
+
+		if is_move() then
+			c.x = c.x - (c.d * c.s)
+		end 
 
 		if(cloud_in_bound(c.x, c.w)) then
 			spr(c.i,c.x,c.y,min(c.w, (screen_w-(2*c.w)-c.x)),c.h)
