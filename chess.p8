@@ -122,7 +122,9 @@ function move_exists(old_x,old_y, new_y, new_x)
 end
 
 function muovi_pezzo(old_x,old_y, new_x, new_y)
+    printh(old_x..', old_y : '..old_y..', '..new_x..' new y : '..new_y, 'my_logs.p8')
     for pezzo in all(pp) do 
+       
         if pezzo.x == old_x and pezzo.y == old_y then 
             local new_pezzo = pezzo
             printh(pezzo.x..', '..pezzo.y..', ')
@@ -132,7 +134,7 @@ function muovi_pezzo(old_x,old_y, new_x, new_y)
             pezzo.y = new_y
 
             add(pp, pezzo)
-            printh(pezzo.x..', '..pezzo.y..', ')
+            printh(pezzo.x..', '..pezzo.y..', ', 'my_logs.p8')
             printh('...................')
             return
         end
