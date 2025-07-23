@@ -87,18 +87,22 @@ function update()
     if btnp(4) then 
         -- selezione elemento grafico le mosse possibili
         if (is_pressed) then
-
+            if is_empty_or_enemy(CURSOR_X, CURSOR_Y, color) then
+                turno = turno =='W' and 'W' or 'B'
+            end
             is_pressed = false   
         else 
             piece = find_piece(CURSOR_X, CURSOR_Y, turno)
             if piece then
-                refresh_available_moves(CURSOR_X, CURSOR_Y, turno)
+                refresh_available_moves(turno, CURSOR_X, CURSOR_Y, piece)
+                is_pressed = true
             end
-            is_pressed = true
+            
         end
     end
     
 end
+
 
 function find_piece(x,y, turno)
     for pezzo in all(pp) do 
@@ -139,7 +143,9 @@ end
 
 function draw_moves()
     foreach(moves, function (move)
-        spr(3,move.x, move.y,1,1)
+        
+        printh(tostr(move.x)..', '..tostr(move.y), 'my_logs', false)
+        spr(3, move.x * block_unit, move.y * block_unit, 1,1)
     end)
 end
 
@@ -210,12 +216,12 @@ function add_pawn_positions(color, x, y)
 
     -- Avanzamento singolo
     if is_valid(x, next_y) and is_empty(x, next_y) then
-        add(moves, {pos_x, pos_y, x, y=next_y})
+        add(moves, {pos_x=pos_x, pos_y=pos_y, x=x, y=next_y})
 
         -- Avanzamento doppio dalla posizione iniziale
         local next2_y = y + dir * 2
         if y == start_row and is_valid(x, next2_y) and is_empty(x, next2_y) then
-            add(moves, {pos_x, pos_y,x, y=next2_y})
+            add(moves, {pos_x=pos_x, pos_y=pos_y,x=x, y=next2_y})
         end
     end
 
@@ -224,7 +230,7 @@ function add_pawn_positions(color, x, y)
         local cx = x + dx
         local cy = y + dir
         if is_valid(cx, cy) and is_enemy(cx, cy, color) then
-            add(moves, {pos_x, pos_y,x=cx, y=cy})
+            add(moves, {pos_x=pos_x, pos_y=pos_y,x=cx, y=cy})
         end
     end
 end
@@ -235,18 +241,18 @@ function add_simple_positions(color, pos_x, pos_y, position_table)
         local x = pos_x + d[1]
         local y = pos_y + d[2]
         if is_valid(x, y) and is_empty_or_enemy(x, y, color) then
-            add(moves, {pos_x, pos_y, x, y})
+            add(moves, {pos_x=pos_x, pos_y=pos_y, x=x, y=y})
         end
     end
     return moves
 end
 
 function add_directions(color, pos_x, pos_y, direction_table)
-    for dir in all(rook_dirs) do
+    for dir in all(direction_table) do
     local x = pos_x + dir[1]
     local y = pos_y + dir[2]
         while is_valid(x, y) and is_empty_or_enemy(x, y, color) do
-            add(moves, {pos_x, pos_y, x, y})
+            add(moves, {pos_x=pos_x, pos_y=pos_y, x=x, y=y})
             if is_enemy(x, y, color) then break end
             x += dir[1]
             y += dir[2]
