@@ -89,7 +89,7 @@ function update()
     if btnp(4) then 
         -- selezione elemento grafico le mosse possibili
         if (is_pressed) then
-            if move_exists(OLD_X,OLD_Y, CURSOR_X, CURSOR_X) then
+            if move_exists(OLD_X,OLD_Y, CURSOR_X, CURSOR_Y) then
                 muovi_pezzo(OLD_X, OLD_Y, CURSOR_X, CURSOR_Y)
                 turno = turno =='W' and 'W' or 'B'
             end
@@ -121,16 +121,19 @@ function move_exists(old_x,old_y, new_y, new_x)
     return false
 end
 
-function muovi_pezzo(old_x,old_y, new_y, new_x)
+function muovi_pezzo(old_x,old_y, new_x, new_y)
     for pezzo in all(pp) do 
         if pezzo.x == old_x and pezzo.y == old_y then 
             local new_pezzo = pezzo
+            printh(pezzo.x..', '..pezzo.y..', ')
             del(pp, pezzo)
             
             pezzo.x = new_x
             pezzo.y = new_y
 
             add(pp, pezzo)
+            printh(pezzo.x..', '..pezzo.y..', ')
+            printh('...................')
             return
         end
     end
