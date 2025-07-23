@@ -12,6 +12,8 @@ pp = {
 
 CURSOR_X =1
 CURSOR_Y =side
+OLD_X = 1
+OLD_Y = side
 turno = 'W'
 is_pressed = false
 piece = ''
@@ -87,7 +89,8 @@ function update()
     if btnp(4) then 
         -- selezione elemento grafico le mosse possibili
         if (is_pressed) then
-            if is_empty_or_enemy(CURSOR_X, CURSOR_Y, color) then
+            if move_exists(OLD_X,OLD_Y, CURSOR_X, CURSOR_X) then
+                muovi_pezzo(OLD_X, OLD_Y, CURSOR_X, CURSOR_Y)
                 turno = turno =='W' and 'W' or 'B'
             end
             is_pressed = false   
@@ -95,6 +98,8 @@ function update()
             piece = find_piece(CURSOR_X, CURSOR_Y, turno)
             if piece then
                 refresh_available_moves(turno, CURSOR_X, CURSOR_Y, piece)
+                OLD_X = CURSOR_X
+                OLD_Y = CURSOR_Y
                 is_pressed = true
             end
             
@@ -102,7 +107,34 @@ function update()
     end
     
 end
+function move_exists(old_x,old_y, new_y, new_x)
+    for move in all(moves) do
+        if (    
+                move.pos_x ==old_x and 
+                move.pos_y ==old_y and 
+                move.x     ==new_x and
+                move.y     ==new_y 
+            ) then 
+            return true
+        end
+    end
+    return false
+end
 
+function muovi_pezzo(old_x,old_y, new_y, new_x)
+    for pezzo in all(pp) do 
+        if pezzo.x == old_x and pezzo.y == old_y then 
+            local new_pezzo = pezzo
+            del(pp, pezzo)
+            
+            pezzo.x = new_x
+            pezzo.y = new_y
+
+            add(pp, pezzo)
+            return
+        end
+    end
+end
 
 function find_piece(x,y, turno)
     for pezzo in all(pp) do 
