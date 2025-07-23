@@ -9,28 +9,14 @@ pp = {
     -- x
     -- y
 }
+
+CURSOR_X =1
+CURSOR_Y =1
 function _init()
     for i=0,15 do
 		palt(i, i==2)
 	end -- assicura che il colore 1 (e altri) siano opachi
     prepare_setup()
-end
-
-function _draw()
-    
-    cls()
-    draw_chessboard()
-    draw_pieces()
-end
--->8
-function draw_chessboard()
-    local sprt;
-    for i=1, side do
-        for j=1, side do 
-            sprt = ((i%2)+j)%2 == 0 and 0 or 1
-            spr(sprt,i *block_unit,j*block_unit,1,1)
-        end
-    end
 end
 
 function prepare_setup()
@@ -91,6 +77,151 @@ function assign_color(y)
     local color = y>=4 and 'W' or 'B'
     return color
 end
+
+
+function _update()
+        if btnp(1) then cursor_move_in_border(-1,0)
+    elseif btnp(2) then cursor_move_in_border(1,0)
+    elseif btnp(3) then cursor_move_in_border(0,1)
+    elseif btnp(4) then cursor_move_in_border(0,-1)
+end
+
+function cursor_move_in_border(x,y)
+    CURSOR_X = min(max(CURSOR_X + x,1),side)
+    CURSOR_Y = min(max(CURSOR_Y + y,1),side)
+end
+
+function _draw()
+    
+    cls()
+    draw_chessboard()
+    draw_pieces()
+end
+-->8
+function draw_chessboard()
+    local sprt;
+    for i=1, side do
+        for j=1, side do 
+            sprt = ((i%2)+j)%2 == 0 and 0 or 1
+            spr(sprt,i *block_unit,j*block_unit,1,1)
+        end
+    end
+end
+
+knight_moves = {
+  {1, 2}, {2, 1}, 
+  {-1, 2}, {-2, 1},
+  {1, -2}, {2, -1}, 
+  {-1, -2}, {-2, -1}
+}
+
+king_moves ={
+    {-1, 1},{ 1,0},{ 1, 1}, 
+    { 0,-1},       { 0, 1},
+    {-1,-1},{-1,0},{-1,-1}, 
+}
+
+rook_dirs = {
+    {1, 0}, {-1, 0}, {0, 1}, {0, -1}
+}
+
+bishop_dirs ={
+    {1,1}, {1,-1}, {-1,1}, {-1,-1}
+}
+
+queen_dirs ={
+    {1, 0}, {-1, 0}, {0, 1}, {0, -1},
+    {1,1}, {1,-1}, {-1,1}, {-1,-1}
+}
+
+function add_pawn_positions(color, x, y, direction_table, moves)
+    local pos_x = x
+    local pos_y = y
+    local dir = color == 'W' and -1 or 1
+    local start_row = color == 'W' and 7 or 2
+    local next_y = y + dir
+
+    -- Avanzamento singolo
+    if is_valid(x, next_y) and is_empty(x, next_y) then
+        add(moves, {pos_x, pos_y, x, next_y})
+
+        -- Avanzamento doppio dalla posizione iniziale
+        local next2_y = y + dir * 2
+        if y == start_row and is_valid(x, next2_y) and is_empty(x, next2_y) then
+            add(moves, {pos_x, pos_y,x, next2_y})
+        end
+    end
+
+    -- Catture diagonali
+    for dx in all({-1, 1}) do
+        local cx = x + dx
+        local cy = y + dir
+        if is_valid(cx, cy) and is_enemy(cx, cy, color) then
+            add(moves, {pos_x, pos_y,cx, cy})
+        end
+    end
+end
+
+
+function add_simple_positions(color, pos_x, pos_y, position_table, moves)
+    for d in all(position_table) do
+        local x = pos_x + d[1]
+        local y = pos_y + d[2]
+        if is_valid(x, y) and is_empty_or_enemy(x, y, color) then
+            add(moves, {pos_x, pos_y, x, y})
+        end
+    end
+    return moves
+end
+
+function add_directions(color, pos_x, pos_y, direction_table, moves)
+    for dir in all(rook_dirs) do
+    local x = pos_x + dir[1]
+    local y = pos_y + dir[2]
+        while is_valid(x, y) and is_empty_or_enemy(x, y, color) do
+            add(moves, {pos_x, pos_y, x, y})
+            if is_enemy(x, y, color) then break end
+            x += dir[1]
+            y += dir[2]
+        end
+    end
+end
+
+function is_empty(x, y)
+    for piece in all(pp) do
+        if piece.x == x and piece.y == y then
+            return false
+        end
+    end
+    return true
+end
+
+function is_empty_or_enemy(x, y, color)
+    return is_empty(x, y) or is_enemy(x, y, color)
+end
+
+function is_enemy(x, y, color)
+    for piece in all(pp) do
+        if piece.x == x and piece.y == y and piece.color ~= color then
+            return true
+        end
+    end
+    return false
+end
+
+function is_valid(x,y)
+    if(
+        (x>0) and
+        (x<=side) and
+        (y<=side) and
+        (y>0)
+    ) then
+        return true
+    else 
+        return false
+    end 
+end
+
 __gfx__
 66666666333333330000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 677777763bbbbbb30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
