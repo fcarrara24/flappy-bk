@@ -89,10 +89,12 @@ function update()
     if btnp(4) then 
         -- selezione elemento grafico le mosse possibili
         if (is_pressed) then
+            
             if move_exists(OLD_X,OLD_Y, CURSOR_X, CURSOR_Y) then
                 muovi_pezzo(OLD_X, OLD_Y, CURSOR_X, CURSOR_Y)
-                turno = turno =='W' and 'W' or 'B'
+                turno = turno =='W' and 'B' or 'W'
             end
+            moves = {}
             is_pressed = false   
         else 
             piece = find_piece(CURSOR_X, CURSOR_Y, turno)
@@ -107,7 +109,7 @@ function update()
     end
     
 end
-function move_exists(old_x,old_y, new_y, new_x)
+function move_exists(old_x,old_y, new_x, new_y)
     for move in all(moves) do
         if (    
                 move.pos_x ==old_x and 
@@ -118,24 +120,22 @@ function move_exists(old_x,old_y, new_y, new_x)
             return true
         end
     end
+    -- printh('move not found', 'my_logs.p8')
     return false
 end
 
 function muovi_pezzo(old_x,old_y, new_x, new_y)
-    printh(old_x..', old_y : '..old_y..', '..new_x..' new y : '..new_y, 'my_logs.p8')
     for pezzo in all(pp) do 
        
         if pezzo.x == old_x and pezzo.y == old_y then 
             local new_pezzo = pezzo
-            printh(pezzo.x..', '..pezzo.y..', ')
+
             del(pp, pezzo)
             
             pezzo.x = new_x
             pezzo.y = new_y
 
-            add(pp, pezzo)
-            printh(pezzo.x..', '..pezzo.y..', ', 'my_logs.p8')
-            printh('...................')
+            add(pp, new_pezzo)
             return
         end
     end
@@ -180,8 +180,7 @@ end
 
 function draw_moves()
     foreach(moves, function (move)
-        
-        printh(tostr(move.x)..', '..tostr(move.y), 'my_logs', false)
+        -- printh(tostr(move.x)..', '..tostr(move.y), 'my_logs', false)
         spr(3, move.x * block_unit, move.y * block_unit, 1,1)
     end)
 end
