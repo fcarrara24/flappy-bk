@@ -12,6 +12,9 @@ pp = {
 
 CURSOR_X =1
 CURSOR_Y =1
+KEYPRESSED_DELAY =15
+KEYPRESSED_FRAME =0
+is_pressed = false
 function _init()
     for i=0,15 do
 		palt(i, i==2)
@@ -79,12 +82,6 @@ function assign_color(y)
 end
 
 
-function _update()
-        if btnp(1) then cursor_move_in_border(-1,0)
-    elseif btnp(2) then cursor_move_in_border(1,0)
-    elseif btnp(3) then cursor_move_in_border(0,1)
-    elseif btnp(4) then cursor_move_in_border(0,-1)
-end
 
 function cursor_move_in_border(x,y)
     CURSOR_X = min(max(CURSOR_X + x,1),side)
@@ -186,6 +183,9 @@ function add_directions(color, pos_x, pos_y, direction_table, moves)
         end
     end
 end
+function is_valid(x,y)
+    return (x>0 and x<=side and y>0 and y<=side)
+end
 
 function is_empty(x, y)
     for piece in all(pp) do
@@ -209,18 +209,6 @@ function is_enemy(x, y, color)
     return false
 end
 
-function is_valid(x,y)
-    if(
-        (x>0) and
-        (x<=side) and
-        (y<=side) and
-        (y>0)
-    ) then
-        return true
-    else 
-        return false
-    end 
-end
 
 __gfx__
 66666666333333330000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
